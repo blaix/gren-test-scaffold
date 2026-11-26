@@ -1,0 +1,20 @@
+module Suite exposing (main)
+
+import E2E
+import Node
+import Test.Runner.Browser as Browser
+import Test.Runner.Effectful as Effectful
+import Unit
+
+
+main : Node.SimpleProgram a
+main =
+    Node.defineSimpleProgram <| \env ->
+    Effectful.initialize env <| \config ->
+    Browser.initialize <| \browserPerms ->
+        [ Effectful.wrap Unit.tests
+        , E2E.tests browserPerms
+        ]
+            |> Effectful.concat
+            |> Effectful.run config
+            |> Node.endSimpleProgram

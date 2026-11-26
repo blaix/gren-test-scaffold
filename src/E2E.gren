@@ -1,0 +1,39 @@
+module E2E exposing (main, tests)
+
+import Expect
+import Node
+import Task exposing (Task)
+import Test.Runner.Browser as Browser
+import Test.Runner.Effectful as Effectful
+
+
+baseUrl : String
+baseUrl =
+    "http://localhost:3000"
+
+
+main : Node.SimpleProgram a
+main =
+    Node.defineSimpleProgram <| \env ->
+    Effectful.initialize env <| \config ->
+    Browser.initialize <| \browserPerms ->
+        tests browserPerms
+            |> Effectful.run config
+            |> Node.endSimpleProgram
+
+
+tests : Browser.Permissions -> Effectful.Test
+tests browserPerms =
+    Effectful.describe "E2E"
+        [ Browser.withSession browserPerms Browser.options <| \session ->
+          Effectful.await "Load the home page" (Browser.navigateTo baseUrl session) <| \_ ->
+          Effectful.await "Read the heading" (getText session "h1") <| \heading ->
+          Effectful.test "it says Hello" <| \_ ->
+            Expect.equal "Hello" heading
+        ]
+
+
+getText : Browser.Session -> String -> Task Browser.Error String
+getText session element =
+    Browser.findElement element session
+        |> Task.andThen (\e -> Browser.getText e session)

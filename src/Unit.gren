@@ -1,0 +1,18 @@
+module Unit exposing (main, tests)
+
+import Expect
+import Test exposing (Test)
+import Test.Runner.Node
+
+
+main : Test.Runner.Node.Program
+main =
+    Test.Runner.Node.run tests
+
+
+tests : Test
+tests =
+    Test.describe "Unit"
+        [ Test.test "example" <| \_ ->
+            Expect.equal True True
+        ]
